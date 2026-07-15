@@ -1,0 +1,9 @@
+# Task 16:
+# Add the required Gazebo–ROS bridge configurations here.
+#
+# Required topics:
+# - /cmd_vel
+# - /odom
+# - /scan
+
+[]
