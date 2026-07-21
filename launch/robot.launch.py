@@ -42,6 +42,12 @@ def generate_launch_description():
         "robot.urdf",
     )
 
+    bridge_config = os.path.join(
+        get_package_share_directory(package_name),
+        "config",
+        "gz_bridge.yaml",
+    )
+
     robot_state_publisher = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -97,6 +103,17 @@ def generate_launch_description():
         output="screen",
     )
 
+    bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        parameters=[
+            {
+                "config_file": bridge_config,
+            }
+        ],
+        output="screen",
+    )
+
     rviz_config_file = os.path.join(
         get_package_share_directory(package_name),
         "rviz",
@@ -118,10 +135,10 @@ def generate_launch_description():
     return LaunchDescription([
         declare_world,
         declare_rviz,
-
         robot_state_publisher,
         gazebo_server,
         gazebo_client,
         spawn_robot,
+        bridge,
         rviz2,
     ])
