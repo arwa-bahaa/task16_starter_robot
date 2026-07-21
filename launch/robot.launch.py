@@ -1,15 +1,12 @@
 import os
 
 from ament_index_python.packages import get_package_share_directory
-
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, GroupAction, IncludeLaunchDescription
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
-
 from launch_ros.actions import Node
-
 
 def generate_launch_description():
 
@@ -27,13 +24,13 @@ def generate_launch_description():
     declare_world = DeclareLaunchArgument(
         "world",
         default_value=world_path,
-        description="Full path to the Gazebo world file",
+        description="Full path to Gazebo world",
     )
 
     declare_rviz = DeclareLaunchArgument(
         "rviz",
         default_value="False",
-        description="Open RViz if set to True",
+        description="Launch RViz",
     )
 
     urdf_path = os.path.join(
@@ -97,6 +94,23 @@ def generate_launch_description():
         output="screen",
     )
 
+    bridge_config = os.path.join(
+        get_package_share_directory(package_name),
+        "config",
+        "gz_bridge.yaml",
+    )
+
+    bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        parameters=[
+            {
+                "config_file": bridge_config,
+            }
+        ],
+        output="screen",
+    )
+
     rviz_config_file = os.path.join(
         get_package_share_directory(package_name),
         "rviz",
@@ -118,10 +132,10 @@ def generate_launch_description():
     return LaunchDescription([
         declare_world,
         declare_rviz,
-
-        robot_state_publisher,
         gazebo_server,
         gazebo_client,
+        robot_state_publisher,
         spawn_robot,
+        bridge,
         rviz2,
     ])
