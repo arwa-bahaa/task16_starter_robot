@@ -1,15 +1,12 @@
 import os
 
 from ament_index_python.packages import get_package_share_directory
-
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, GroupAction, IncludeLaunchDescription
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
-
 from launch_ros.actions import Node
-
 
 def generate_launch_description():
 
@@ -40,6 +37,12 @@ def generate_launch_description():
         get_package_share_directory(package_name),
         "urdf",
         "robot.urdf",
+    )
+
+    bridge_config = os.path.join(
+        get_package_share_directory(package_name),
+        "config",
+        "gz_bridge.yaml",
     )
 
     robot_state_publisher = IncludeLaunchDescription(
@@ -83,6 +86,7 @@ def generate_launch_description():
         }.items(),
     )
 
+    # Spawn Robot
     spawn_robot = Node(
         package="ros_gz_sim",
         executable="create",
@@ -93,6 +97,18 @@ def generate_launch_description():
             "diff_bot",
             "-z",
             "0.2",
+        ],
+        output="screen",
+    )
+
+    # Gazebo <-> ROS Bridge
+    bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        parameters=[
+            {
+                "config_file": bridge_config,
+            }
         ],
         output="screen",
     )
@@ -118,10 +134,10 @@ def generate_launch_description():
     return LaunchDescription([
         declare_world,
         declare_rviz,
-
         robot_state_publisher,
         gazebo_server,
         gazebo_client,
         spawn_robot,
+        bridge,
         rviz2,
     ])
