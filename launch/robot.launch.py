@@ -32,8 +32,8 @@ def generate_launch_description():
 
     declare_rviz = DeclareLaunchArgument(
         "rviz",
-        default_value="True",
-        description="Launch RViz",
+        default_value="False",
+        description="Open RViz if set to True",
     )
 
     urdf_path = os.path.join(
@@ -65,7 +65,7 @@ def generate_launch_description():
             )
         ),
         launch_arguments={
-            "gz_args": ["-r ", world],
+            "gz_args": ["-r -s -v1 ", world],
             "on_exit_shutdown": "true",
         }.items(),
     )
@@ -82,7 +82,7 @@ def generate_launch_description():
             "gz_args": "-g",
         }.items(),
     )
-    
+
     spawn_robot = Node(
         package="ros_gz_sim",
         executable="create",
@@ -117,39 +117,25 @@ def generate_launch_description():
 
     bridge_params = os.path.join(
         get_package_share_directory(package_name),
-        "config",
-        "gz_bridge.yaml",
+        'config',
+        'gz_bridge.yaml'
     )
 
     parameter_bridge = Node(
-        package="ros_gz_bridge",
-        executable="parameter_bridge",
-        parameters=[
-            {
-                "config_file": bridge_params,
-            }
-        ],
-        remappings=[
-            ("/tf", "tf"),
-            ("/tf_static", "tf_static"),
-        ],
-        output="screen",
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        parameters=[{'config_file': bridge_params}],
+        output='screen'
     )
 
     return LaunchDescription([
-
         declare_world,
         declare_rviz,
 
         robot_state_publisher,
-
         gazebo_server,
         gazebo_client,
-
         spawn_robot,
-
-        parameter_bridge,
-
         rviz2,
-
+        parameter_bridge,
     ])
