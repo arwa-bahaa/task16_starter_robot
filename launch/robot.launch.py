@@ -42,7 +42,6 @@ def generate_launch_description():
         "robot.urdf",
     )
 
-    # Robot State Publisher
     robot_state_publisher = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -57,7 +56,6 @@ def generate_launch_description():
         }.items(),
     )
 
-    # Gazebo Server
     gazebo_server = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -72,7 +70,6 @@ def generate_launch_description():
         }.items(),
     )
 
-    # Gazebo GUI
     gazebo_client = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -85,8 +82,7 @@ def generate_launch_description():
             "gz_args": "-g",
         }.items(),
     )
-
-    # Spawn Robot
+    
     spawn_robot = Node(
         package="ros_gz_sim",
         executable="create",
@@ -101,7 +97,6 @@ def generate_launch_description():
         output="screen",
     )
 
-    # RViz
     rviz_config_file = os.path.join(
         get_package_share_directory(package_name),
         "rviz",
@@ -120,7 +115,6 @@ def generate_launch_description():
         ],
     )
 
-    # Gazebo <-> ROS Bridge
     bridge_params = os.path.join(
         get_package_share_directory(package_name),
         "config",
